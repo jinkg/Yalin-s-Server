@@ -16,36 +16,46 @@
 
 package com.yalin.fidouaf.res.util;
 
+import org.apache.commons.codec.binary.Base64;
 import org.ebayopensource.fido.uaf.msg.DeregisterAuthenticator;
 import org.ebayopensource.fido.uaf.msg.DeregistrationRequest;
+import org.ebayopensource.fido.uaf.msg.Operation;
+import org.ebayopensource.fido.uaf.msg.OperationHeader;
+import org.ebayopensource.fido.uaf.msg.Version;
 import org.ebayopensource.fido.uaf.storage.AuthenticatorRecord;
 
 import com.google.gson.Gson;
 import com.yalin.fidouaf.stats.Dash;
 
 public class DeregRequestProcessor {
+	public static final String APP_ID = "https://uaf.ebay.com/uaf/facets";
+	private String appId = APP_ID;
 	private Gson gson = new Gson();
 
-	public String process(String payload) {
+	public DeregistrationRequest[] process(String payload) {
+		DeregistrationRequest[] deregFromJson = null;
 		try {
-			DeregistrationRequest[] deregFromJson = gson.fromJson(payload,
-					DeregistrationRequest[].class);
+			deregFromJson = gson.fromJson(payload, DeregistrationRequest[].class);
 			DeregistrationRequest deregRequest = deregFromJson[0];
+			deregRequest.header = new OperationHeader();
+			deregRequest.header.op = Operation.Dereg;
+			deregRequest.header.appID = appId;
+			deregRequest.header.upv = new Version(1, 0);
 			Dash.getInstance().stats.put(Dash.LAST_DEREG_REQ, deregFromJson);
 			AuthenticatorRecord authRecord = new AuthenticatorRecord();
 			for (DeregisterAuthenticator authenticator : deregRequest.authenticators) {
 				authRecord.AAID = authenticator.aaid;
-				authRecord.KeyID = authenticator.keyID;
+				authRecord.KeyID = Base64.encodeBase64URLSafeString(authenticator.keyID.getBytes());
 				try {
 					String Key = authRecord.toString();
 					StorageImpl.getInstance().deleteRegistrationRecord(Key);
 				} catch (Exception e) {
-					return "Failure: Problem in deleting record from local DB";
+					return null;
 				}
 			}
 		} catch (Exception e) {
-			return "Failure: problem processing deregistration request";
+			return null;
 		}
-		return "Success";
+		return deregFromJson;
 	}
 }

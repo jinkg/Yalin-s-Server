@@ -225,10 +225,11 @@ public class DBHelper {
 			rs = pst.executeQuery();
 			if (rs.next()) {
 				int authId = rs.getInt(rs.findColumn(RegistrationRecord.KEY_REG_AUTHID));
-				pst = conn.prepareStatement("DELTE * from Authenticator where id='" + authId + "'");
+				pst = conn.prepareStatement("DELETE FROM Authenticator where id='" + authId + "'");
 				pst.executeUpdate();
 			}
-			pst.executeUpdate("DELTE * from RegRecords where indexKey='" + indexKey + "'");
+			pst.executeUpdate(
+					"DELETE FROM RegRecords where " + RegistrationRecord.KEY_REG_INDEXID + "= '" + indexKey + "'");
 			conn.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();

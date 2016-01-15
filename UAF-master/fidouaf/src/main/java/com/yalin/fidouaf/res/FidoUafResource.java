@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.codec.binary.Base64;
 import org.ebayopensource.fido.uaf.msg.AuthenticationRequest;
 import org.ebayopensource.fido.uaf.msg.AuthenticationResponse;
+import org.ebayopensource.fido.uaf.msg.DeregistrationRequest;
 import org.ebayopensource.fido.uaf.msg.Operation;
 import org.ebayopensource.fido.uaf.msg.OperationHeader;
 import org.ebayopensource.fido.uaf.msg.RegistrationRequest;
@@ -178,8 +179,8 @@ public class FidoUafResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String deregRequestPublic(String payload) {
-
-		return new DeregRequestProcessor().process(payload);
+		DeregistrationRequest[] result = new DeregRequestProcessor().process(payload);
+		return ResponseBuilder.buildDeRegResultData(result);
 	}
 
 	@GET
