@@ -1,7 +1,6 @@
 package com.yalin.fidouaf.response;
 
 import org.ebayopensource.fido.uaf.msg.AuthenticationRequest;
-import org.ebayopensource.fido.uaf.msg.AuthenticationResponse;
 import org.ebayopensource.fido.uaf.msg.DeregistrationRequest;
 import org.ebayopensource.fido.uaf.msg.RegistrationRequest;
 import org.ebayopensource.fido.uaf.storage.AuthenticatorRecord;
@@ -32,7 +31,4 @@ public class ResponseBuilder {
 		return s;
 	}
 
-	public static String buildNoDeviceError() {
-		return new JsonHttpResponse(ErrorCode.ERROR_NO_DEVICE_ERROR).toJson();
-	}
 }
